@@ -1,5 +1,5 @@
 module github.com/cyctw/line-profile-bot
-
+// +heroku goVersion go1.17
 go 1.17
 
 require (
