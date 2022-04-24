@@ -21,36 +21,15 @@ export default function Home(props) {
     e.preventDefault()
     try {
       const idToken = liff.getIDToken()
-      // await createActivity({ activity, date, place, idToken });
+      await createActivity({ activity, date, place, idToken });
 
       // Submit message
       
       await liff.sendMessages([
         {
-          type: "template",
-          altText: "This is a buttons template",
-          template: {
-            type: "buttons",
-            thumbnailImageUrl: "https://example.com/bot/images/image.jpg",
-            imageAspectRatio: "rectangle",
-            imageSize: "cover",
-            imageBackgroundColor: "#FFFFFF",
-            title: "Menu",
-            text: "Please select",
-            defaultAction: {
-              type: "uri",
-              label: "View detail",
-              uri: "http://example.com/page/123",
-            },
-            actions: [
-              {
-                type: "postback",
-                label: "Attend!",
-                data: "action=attend"
-              }
-            ],
-          },
-        },
+          "type": "text",
+          "text": "我要舉辦活動!"
+        }
       ]);
       console.log("Success!!")
     } catch (err) {
