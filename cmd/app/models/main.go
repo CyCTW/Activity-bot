@@ -32,7 +32,6 @@ func ConnectDatabase() {
 
 	db.AutoMigrate(&User{})
 	db.AutoMigrate(&User{})
-	db.AutoMigrate(&Participation{})
 
 	DB = db
 }
