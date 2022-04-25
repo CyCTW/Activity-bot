@@ -1,5 +1,6 @@
 import "../styles/globals.css";
 import { useState, useEffect } from "react";
+import { ChakraProvider } from "@chakra-ui/react";
 
 function MyApp({ Component, pageProps }) {
   const [liffObject, setLiffObject] = useState(null);
@@ -13,10 +14,6 @@ function MyApp({ Component, pageProps }) {
       liff
         .init({ liffId: process.env.LIFF_ID, withLoginOnExternalBrowser: true })
         .then(() => {
-          // const logged = liff.isLoggedIn()
-          // console.log("logged in: ", logged)
-          // console.log(liff.getDecodedIDToken())
-          // console.log(liff.getContext())
           console.log("liff.init() done");
           setLiffObject(liff);
         })
@@ -36,7 +33,11 @@ function MyApp({ Component, pageProps }) {
   // to page component as property
   pageProps.liff = liffObject;
   pageProps.liffError = liffError;
-  return <Component {...pageProps} />;
+  return (
+    <ChakraProvider>
+      <Component {...pageProps} />
+    </ChakraProvider>
+  );
 }
 
 export default MyApp;

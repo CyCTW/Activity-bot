@@ -1,340 +1,103 @@
 package controllers
 
 import (
+	"fmt"
 	"log"
+	"net/url"
+	"os"
+	"strings"
 
+	"github.com/cyctw/line-profile-bot/cmd/app/models"
 	"github.com/line/line-bot-sdk-go/v7/linebot"
 )
 
-func (app *ProfileBot) MessageEventHandler(event *linebot.Event) {
+func (app *ProfileBot) MessageEventHandler(event *linebot.Event) error {
 	// Do something
 	switch message := event.Message.(type) {
 	case *linebot.TextMessage:
-		switch message.Text {
-		case "你是誰?":
-			if err := app.HandleIntroduction(event); err != nil {
-				log.Print(err)
-			}
-		case "你的學歷":
-			if err := app.HandleEducation(event); err != nil {
-				log.Print(err)
-			}
-		case "你的經歷":
-			if err := app.HandleExperience(event); err != nil {
-				log.Print(err)
+		completeMessage := message.Text
+		log.Print(completeMessage)
+		messageArray := strings.Split(completeMessage, ", ")
+		prefixMessage := messageArray[0]
+		log.Print(prefixMessage)
 
-			}
-		case "如何聯絡你?":
-			if err := app.HandleContact(event); err != nil {
+		switch prefixMessage {
+		case "顯示活動表單":
+			if err := app.HandleShowActivity(event); err != nil {
 				log.Print(err)
-
+				return err
 			}
-		case "你的前端專案":
-			if err := app.HandleFrontendProject(event); err != nil {
-				log.Print(err)
+		case "我要舉辦活動":
+			// idx := strings.Index(completeMessage, "ID: ")
+			activityID := messageArray[1][4:]
+			log.Print(activityID)
 
-			}
-		case "你的後端專案":
-			if err := app.HandleBackendProject(event); err != nil {
+			if err := app.HandleCreateActivity(event, activityID); err != nil {
 				log.Print(err)
-
-			}
-		case "你的區塊鏈專案":
-			if err := app.HandleBlockchainProject(event); err != nil {
-				log.Print(err)
-
-			}
-		case "你的特質":
-			if err := app.HandlePersonal(event); err != nil {
-				log.Print(err)
-
+				return err
 			}
 		}
-		if _, err := app.bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(message.Text)).Do(); err != nil {
-			log.Print(err)
-		}
+		// if _, err := app.bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(message.Text)).Do(); err != nil {
+		// 	log.Print(err)
+		// 	return err
+		// }
 	default:
 		log.Print("Unimplement message event type")
 	}
+	return nil
 }
 
-func (app *ProfileBot) HandleIntroduction(event *linebot.Event) error {
+func (app *ProfileBot) HandleShowActivity(event *linebot.Event) error {
+	// TODO: Show Form LIFF link
+	LIFF_url := os.Getenv("LIFF_URL")
+	imageURL := "https://image.com"
 
-	flexJsonString := `{
-	"type": "bubble",
-	"header": {
-		"type": "box",
-		"layout": "vertical",
-		"contents": [
-		{
-			"type": "text",
-			"text": "Software Engineer Intern",
-			"weight": "bold"
-		}
-		]
-	},
-	"hero": {
-		"type": "image",
-		"url": "https://lh3.googleusercontent.com/d/1D5O1PUn7Pw4hs7rlHvoHhU14x18Riv23",
-		"size": "xl"
-	},
-	"body": {
-		"type": "box",
-		"layout": "vertical",
-		"contents": [
-		{
-			"type": "text",
-			"text": "Cheng Yuan Chang",
-			"size": "xl",
-			"weight": "bold",
-			"align": "center"
-		},
-		{
-			"type": "text",
-			"text": "NTU student",
-			"align": "center"
-		},
-		{
-			"type": "separator",
-			"margin": "md"
-		},
-		{
-			"type": "box",
-			"layout": "vertical",
-			"contents": [
-			{
-				"type": "button",
-				"action": {
-				"type": "uri",
-				"label": "Visit my website👀",
-				"uri": "https://cyctw.github.io/"
-				},
-				"style": "primary"
-			},
-			{
-				"type": "button",
-				"action": {
-				"type": "message",
-				"label": "Contact me✔️",
-				"text": "如何聯絡你?"
-				},
-				"style": "link"
-			}
-			],
-			"paddingTop": "10px"
-		}
-		]
-	},
-	"styles": {
-		"header": {
-		"backgroundColor": "#328fa8"
-		}
+	template := linebot.NewButtonsTemplate(
+		imageURL, "Build your activity!", "請點選以下按鈕填寫事件詳細資訊!",
+		linebot.NewURIAction("建立事件", LIFF_url),
+	)
+	if _, err := app.bot.ReplyMessage(event.ReplyToken, linebot.NewTemplateMessage("Buttons alt text", template)).Do(); err != nil {
+		return err
 	}
-}`
+	return nil
+}
 
-	contents, err := linebot.UnmarshalFlexMessageJSON([]byte(flexJsonString))
+func (app *ProfileBot) HandleCreateActivity(event *linebot.Event, activityID string) error {
+	// TODO: Perform "attend" button template
+	imageURL := "https://image.com"
+	actionPayload := fmt.Sprintf("action=attend&activityID=%v", activityID)
+
+	var activity models.Activity
+	if err := activity.GetByID(activityID); err != nil {
+		return err
+	}
+	redirect_uri := os.Getenv("LINE_NOTIFY_REDIRECT_URI")
+	lineNotifyClientID := os.Getenv("LINE_NOTIFY_CLIENT_ID")
+
+	title := fmt.Sprintf("活動: %v", activity.Name)
+	userID := event.Source.UserID
+	profile, err := app.bot.GetProfile(userID).Do()
 	if err != nil {
 		return err
 	}
-	if _, err := app.bot.ReplyMessage(event.ReplyToken, linebot.NewFlexMessage("My self-introduction", contents)).Do(); err != nil {
+	state := fmt.Sprintf("%v_%v", userID, profile.DisplayName)
+
+	params := url.Values{}
+	params.Add("response_type", "code")
+	params.Add("client_id", lineNotifyClientID)
+	params.Add("redirect_uri", redirect_uri)
+	params.Add("scope", "notify")
+	params.Add("state", state)
+	lineNotifyURL := fmt.Sprintf("https://notify-bot.line.me/oauth/authorize?%v", params.Encode())
+
+	template := linebot.NewButtonsTemplate(
+		imageURL, title, "若要參加，請先點選\"授權通知\"，再按下我要\"參加按鈕\"",
+		linebot.NewURIAction("授權通知", lineNotifyURL),
+		linebot.NewPostbackAction("我要參加", actionPayload, "", ""),
+	)
+
+	if _, err := app.bot.ReplyMessage(event.ReplyToken, linebot.NewTemplateMessage("Buttons alt text", template)).Do(); err != nil {
 		return err
 	}
 	return nil
-}
-
-func (app *ProfileBot) HandleEducation(event *linebot.Event) error {
-
-	flexJsonString := `
-	{
-		"type": "carousel",
-		"contents": [
-		  {
-			"type": "bubble",
-			"header": {
-			  "type": "box",
-			  "layout": "vertical",
-			  "contents": [
-				{
-				  "type": "text",
-				  "text": "National Taiwan University",
-				  "align": "center",
-				  "weight": "bold"
-				}
-			  ],
-			  "backgroundColor": "#f5a742"
-			},
-			"hero": {
-			  "type": "image",
-			  "url": "https://lh3.googleusercontent.com/d/1NgT4DVPmifgPRSGQbaSVBFoPEdoIw-gD",
-			  "size": "md",
-			  "margin": "none",
-			  "offsetTop": "none",
-			  "position": "relative",
-			  "offsetBottom": "none"
-			},
-			"body": {
-			  "type": "box",
-			  "layout": "vertical",
-			  "contents": [
-				{
-				  "type": "text",
-				  "text": "Major",
-				  "weight": "bold",
-				  "size": "xl"
-				},
-				{
-				  "type": "text",
-				  "text": "Electrical Engineer (CS)"
-				},
-				{
-				  "type": "separator",
-				  "margin": "10px"
-				},
-				{
-				  "type": "text",
-				  "text": "Time",
-				  "weight": "bold",
-				  "size": "xl",
-				  "margin": "10px"
-				},
-				{
-				  "type": "text",
-				  "text": "2021/09 ~ present"
-				},
-				{
-				  "type": "separator",
-				  "margin": "10px"
-				},
-				{
-				  "type": "text",
-				  "text": "Research Interest",
-				  "margin": "10px",
-				  "weight": "bold",
-				  "size": "lg"
-				},
-				{
-				  "type": "text",
-				  "text": "Blockchain Layer2, Cross chain"
-				}
-			  ],
-			  "offsetTop": "none"
-			}
-		  },
-		  {
-			"type": "bubble",
-			"header": {
-			  "type": "box",
-			  "layout": "vertical",
-			  "contents": [
-				{
-				  "type": "text",
-				  "text": "National Chiao Tung University",
-				  "align": "center",
-				  "weight": "bold"
-				}
-			  ],
-			  "backgroundColor": "#3299a8"
-			},
-			"hero": {
-			  "type": "image",
-			  "url": "https://lh3.googleusercontent.com/d/1YuQyVXDtsouoj7RvFUCBubApXB2Vdqf8",
-			  "size": "md",
-			  "offsetTop": "none"
-			},
-			"body": {
-			  "type": "box",
-			  "layout": "vertical",
-			  "contents": [
-				{
-				  "type": "text",
-				  "text": "Major",
-				  "size": "xl",
-				  "weight": "bold"
-				},
-				{
-				  "type": "text",
-				  "text": "Computer Science"
-				},
-				{
-				  "type": "separator",
-				  "margin": "10px"
-				},
-				{
-				  "type": "text",
-				  "text": "Time",
-				  "size": "xl",
-				  "weight": "bold",
-				  "margin": "10px"
-				},
-				{
-				  "type": "text",
-				  "text": "2017/09 ~ 2021/06"
-				}
-			  ]
-			},
-			"styles": {
-			  "body": {
-				"separator": false
-			  }
-			}
-		  }
-		]
-	  }`
-	contents, err := linebot.UnmarshalFlexMessageJSON([]byte(flexJsonString))
-	if err != nil {
-		return err
-	}
-	if _, err := app.bot.ReplyMessage(event.ReplyToken, linebot.NewFlexMessage("My Education", contents)).Do(); err != nil {
-		return err
-	}
-	return nil
-
-}
-func (app *ProfileBot) HandleExperience(event *linebot.Event) error {
-	return nil
-
-}
-func (app *ProfileBot) HandleContact(event *linebot.Event) error {
-	messages := linebot.NewTextMessage("請選擇以下一種方式來連繫我!").
-		WithQuickReplies(linebot.NewQuickReplyItems(
-			linebot.NewQuickReplyButton(
-				// app.appBaseURL+"/static/quick/sushi.png",
-				"",
-				linebot.NewURIAction("Phone", "tel:0987591062")),
-			linebot.NewQuickReplyButton(
-				// app.appBaseURL+"/static/quick/tempura.png",
-				"",
-				linebot.NewURIAction("Email", "mailto:0cyctwn@gmail.com")),
-			linebot.NewQuickReplyButton(
-				"",
-				linebot.NewURIAction("Line", "https://line.me/ti/p/WO21tN7ePW")),
-			linebot.NewQuickReplyButton(
-				"",
-				linebot.NewURIAction("Facebook", "https://www.facebook.com/NCTU193/")),
-			linebot.NewQuickReplyButton(
-				"",
-				linebot.NewURIAction("Linkedin", "https://www.linkedin.com/in/cyctw/")),
-		))
-	_, err := app.bot.ReplyMessage(event.ReplyToken, messages).Do()
-	if err != nil {
-		return err
-	}
-	return nil
-
-}
-func (app *ProfileBot) HandleFrontendProject(event *linebot.Event) error {
-	return nil
-
-}
-func (app *ProfileBot) HandleBackendProject(event *linebot.Event) error {
-	return nil
-
-}
-func (app *ProfileBot) HandleBlockchainProject(event *linebot.Event) error {
-	return nil
-
-}
-func (app *ProfileBot) HandlePersonal(event *linebot.Event) error {
-	return nil
-
 }

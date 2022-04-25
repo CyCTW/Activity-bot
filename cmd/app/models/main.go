@@ -1,37 +1,45 @@
 package models
 
 import (
+	"os"
+	"time"
+
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
 type Activity struct {
 	gorm.Model
-	Name  string
-	Time  string
-	Place string
-	Users []*User `gorm:"many2many:participations"`
+	Name   string
+	Date   time.Time
+	Place  string
+	UserID uint
+	User   User    // Activity Holder
+	Users  []*User `gorm:"many2many:participations"` // Attendee
 }
 
 type User struct {
 	gorm.Model
-	user_id    string
-	token      string
-	name       string
-	Activities []*Activity `gorm:"many2many:participations"`
+	LineUserID  string `gorm:"uniqueIndex"`
+	AccessToken string
+	Name        string
+	Activities  []*Activity `gorm:"many2many:participations"`
 }
 
 var DB *gorm.DB
 
 func ConnectDatabase() {
-	dsn := "root:root@tcp(127.0.0.1:3306)/gocrud?charset=utf8mb4&parseTime=True&loc=Local"
+	dsn := os.Getenv("DATABASE_URL")
+
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic("Failed to connect db")
 	}
+	db.Migrator().DropTable(&User{})
+	db.Migrator().DropTable(&Activity{})
 
 	db.AutoMigrate(&User{})
-	db.AutoMigrate(&User{})
+	db.AutoMigrate(&Activity{})
 
 	DB = db
 }
