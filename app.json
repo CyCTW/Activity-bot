@@ -1,0 +1,50 @@
+{
+    "name": "Activity Bot",
+    "description": "The smart bot that notify event",
+    "keywords": [
+      "linebot",
+      "golang",
+      "nextjs"
+    ],
+    "website": "https://github.com/CyCTW/Activity-bot",
+    "repository": "https://github.com/CyCTW/Activity-bot",
+    "env": {
+      "CHANNEL_ACCESS_TOKEN": {
+        "description": "Line message api access token"
+      },
+      "CHANNEL_SECRET": {
+        "description": "Line message api secret"
+      },
+      "LIFF_ID": {
+        "description": "Line liff id"
+      },
+      "LIFF_URL": {
+        "description": "Line liff url"
+      },
+      "LINE_LOGIN_CHANNEL_ID": {
+        "description": "Line login channe id"
+      },
+      "LINE_NOTIFY_CLIENT_ID": {
+        "description": "Line notify client id"
+      },
+      "LINE_NOTIFY_CLIENT_SECRET": {
+        "description": "Line Notify client secret"
+      },
+      "LINE_NOTIFY_REDIRECT_URI": {
+        "description": "Line Notify redirect uri"
+      }
+    },
+    "addons": [
+      {
+        "plan": "heroku-postgresql:hobby-dev",
+        "options": {
+          "version": "9.5"
+        }
+      }
+    ],
+    "buildpacks": [
+      {
+        "url": "heroku/go"
+      }
+    ]
+  }

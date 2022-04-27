@@ -25,6 +25,18 @@
     
 
 ## Get started
+ 
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
+
+or
+```
+git clone https://github.com/cyctw/Activity-bot && cd Activity-bot
+```
+
+```
+go mod tidy
+go run cmd/app/server.go
+```
 ### Line Notify
 User可以選擇要在哪個群組(or 個人)通知我
 ### Deploy on Heroku
