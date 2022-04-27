@@ -15,12 +15,16 @@ func main() {
 		log.Fatal(err)
 	}
 	models.ConnectDatabase()
+	/* Debug Mode */
+	// r := gin.Default()
 
-	r := gin.Default()
-	r.LoadHTMLGlob("views/*")
+	/* Production Mode */
+	gin.SetMode(gin.ReleaseMode)
+	r := gin.New()
+
+	r.LoadHTMLGlob("./views/*")
 	r.Static("assets", "../nextjs/out")
 	r.POST("/callback", app.CallbackHandler)
-	// r.POST("/notify", app.NotifyPostHandler)
 	r.GET("/activity/:id", app.ActivityGetHandler)
 	r.GET("/user/:id", app.UserHandler)
 	r.GET("/notify", app.NotifyGetHandler)
