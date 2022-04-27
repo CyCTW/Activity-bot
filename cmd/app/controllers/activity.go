@@ -46,7 +46,7 @@ func (app *ProfileBot) ActivityGetHandler(c *gin.Context) {
 		return
 	}
 	log.Print(users)
-	c.JSON(200, gin.H{"activity": activity, "users": users})
+	c.JSON(http.StatusOK, gin.H{"activity": activity, "users": users})
 }
 
 func (app *ProfileBot) ActivityPostHandler(c *gin.Context) {
@@ -61,7 +61,7 @@ func (app *ProfileBot) ActivityPostHandler(c *gin.Context) {
 	log.Print("token", idToken)
 	lineProfile, err := getProfile(idToken)
 	if err != nil {
-		c.JSON(404, gin.H{"message": "Get profile fail"})
+		c.JSON(http.StatusNotFound, gin.H{"message": "Get profile fail"})
 		return
 	}
 
@@ -95,7 +95,7 @@ func (app *ProfileBot) ActivityPostHandler(c *gin.Context) {
 		return
 	}
 	// TODO: Return Activity ID
-	c.JSON(200, gin.H{"activityName": activity.Name})
+	c.JSON(http.StatusOK, gin.H{"activityName": activity.Name})
 }
 
 func getProfile(idToken string) (*LineProfileInput, error) {

@@ -17,19 +17,19 @@ import (
 func (app *ProfileBot) CallbackHandler(c *gin.Context) {
 
 	// Early response First
-	c.JSON(200, gin.H{"message": "early return"})
+	c.JSON(http.StatusOK, gin.H{"message": "early return"})
 	// Verification header
 	err := verifyLineSignature(c.Request, app.channel_secret)
 	if err != nil {
 		log.Print("Verify Failed")
-		c.JSON(404, gin.H{"message": "Header verification fail"})
+		c.JSON(http.StatusNotFound, gin.H{"message": "Header verification fail"})
 		return
 	}
 
 	events, err := app.bot.ParseRequest(c.Request)
 	if err != nil {
 		log.Print("Parse request fail!")
-		c.JSON(404, gin.H{"message": "Parse request fail"})
+		c.JSON(http.StatusNotFound, gin.H{"message": "Parse request fail"})
 		return
 	}
 

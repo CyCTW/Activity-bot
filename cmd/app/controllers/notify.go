@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -23,13 +24,13 @@ func (app *ProfileBot) NotifyTestGetHandler(c *gin.Context) {
 	var user models.User
 	err := user.GetByID(id)
 	if err != nil {
-		c.JSON(404, gin.H{"message": "Fail"})
+		c.JSON(http.StatusNotFound, gin.H{"message": "Fail"})
 	}
 	if err := NotifyUser(user.AccessToken, "GGG"); err != nil {
-		c.JSON(400, gin.H{"message": "notify fail"})
+		c.JSON(http.StatusBadRequest, gin.H{"message": "notify fail"})
 	}
 
-	c.JSON(200, gin.H{"message": "success!"})
+	c.JSON(http.StatusOK, gin.H{"message": "success!"})
 }
 
 func (app *ProfileBot) NotifyGetHandler(c *gin.Context) {
@@ -40,19 +41,18 @@ func (app *ProfileBot) NotifyGetHandler(c *gin.Context) {
 	user_id := strings.Split(state, "_")[0]
 	username := strings.Split(state, "_")[1]
 
-	redirect_uri := os.Getenv("LINE_NOTIFY_REDIRECT_URI")
 	log.Print("UID: ", user_id)
 	log.Print("code: ", code)
-	access_token, err := getAccessToken(code, redirect_uri)
+	access_token, err := getAccessToken(code)
 	if err != nil {
 		log.Print(err)
-		c.JSON(400, gin.H{"message": "失敗!!!"})
+		c.JSON(http.StatusBadRequest, gin.H{"message": "失敗，請稍後再試"})
 		return
 	}
 	// Store access token
 	var user models.User
 	user.StoreAccessToken(user_id, username, access_token)
-	c.JSON(200, gin.H{"message": "開啟通知成功!"})
+	c.HTML(http.StatusOK, "notify.html", gin.H{"title": "website"})
 
 }
 
@@ -81,8 +81,8 @@ func NotifyUser(access_token string, message string) error {
 	return nil
 }
 
-func getAccessToken(code string, redirect_uri string) (string, error) {
-
+func getAccessToken(code string) (string, error) {
+	redirect_uri := os.Getenv("LINE_NOTIFY_REDIRECT_URI")
 	client_id := os.Getenv("LINE_NOTIFY_CLIENT_ID")
 	client_secret := os.Getenv("LINE_NOTIFY_CLIENT_SECRET")
 
@@ -109,11 +109,13 @@ func getAccessToken(code string, redirect_uri string) (string, error) {
 	defer res.Body.Close()
 	log.Print("Get success!!><")
 	log.Print(res.Status)
+	if res.StatusCode != http.StatusOK {
+		return "", errors.New("Get access token failed")
+	}
+
 	var notifyToken LineNotifyResponse
 	log.Print("body", res.Body)
 	err = json.NewDecoder(res.Body).Decode(&notifyToken)
-	// body, err := ioutil.ReadAll(res.Body)
-	// err = json.Unmarshal(body, &notifyToken)
 	if err != nil {
 		return "", err
 	}

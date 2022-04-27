@@ -31,5 +31,3 @@ func RemoveScheduler(user *models.User, activityID string) {
 	userLineID := user.LineUserID
 	s.RemoveByTags(userLineID, activityID)
 }
-
-// aveIhis01dqAHEXA2AlDUZqY4R2m7nAuymDsyIl4rp3

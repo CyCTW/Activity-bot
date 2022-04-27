@@ -35,16 +35,6 @@ type Participation struct {
 
 func (activity *Activity) GetInfo(activityID string) (*[]APIUser, error) {
 	var users []APIUser
-	// Preload
-	// var result Participation
-	// DB.Raw("SELECT * FROM participations").Scan(&result)
-	// log.Print("aid", result.ActivityID)
-	// log.Print("uid", result.UserID)
-	// log.Print("Before")
-	// log.Print(activity)
-	// DB.Preload("Users").First(&activity, activityID)
-	// log.Print("After")
-	// log.Print(activity)
 
 	DB.Model(&activity).Association("Users").Find(&users)
 

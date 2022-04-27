@@ -12,7 +12,7 @@ import (
 
 func (app *ProfileBot) PostBackEventHandler(event *linebot.Event) error {
 	// Do something
-	// data format: action=[attend]&activityID=[3]
+	// data format: action=[attend]&activityName=[Name]
 	log.Print("Postback Event: ", event.Postback)
 
 	data := event.Postback.Data
@@ -35,15 +35,7 @@ func (app *ProfileBot) PostBackEventHandler(event *linebot.Event) error {
 	}
 	switch action {
 	case "attend":
-		// TODO: Check Notify access_token exists
-		// Create User if not exists
-		// user := models.User{LineUserID: userID, Name: profile.DisplayName}
-		// log.Print(user)
-		// Note: This time user should exists
-		// if err := user.Create(); err != nil {
-		// 	log.Print(err)
-		// 	return err
-		// }
+
 		var user models.User
 		err := user.GetByLineID(userID)
 		if err != nil {
@@ -60,7 +52,7 @@ func (app *ProfileBot) PostBackEventHandler(event *linebot.Event) error {
 		if err != nil {
 			return err
 		}
-		// TODO: Add user to attendee
+		// Add user to attendee
 		if err := activity.AddParticipants(&user); err != nil {
 			return err
 		}
@@ -69,7 +61,7 @@ func (app *ProfileBot) PostBackEventHandler(event *linebot.Event) error {
 			log.Print(err)
 			return err
 		}
-		// TODO: Start scheduler
+		// Start scheduler
 		log.Print("Start scheduler")
 		StartScheduler(&user, &activity)
 	default:

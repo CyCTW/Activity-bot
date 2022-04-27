@@ -17,5 +17,5 @@ func (app *ProfileBot) UserHandler(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, gin.H{"user": user})
+	c.JSON(http.StatusOK, gin.H{"user": user})
 }

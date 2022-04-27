@@ -17,7 +17,8 @@ func main() {
 	models.ConnectDatabase()
 
 	r := gin.Default()
-	r.Static("assets", "./static/line-liff-v2-starter/src/nextjs/out")
+	r.LoadHTMLGlob("views/*")
+	r.Static("assets", "../nextjs/out")
 	r.POST("/callback", app.CallbackHandler)
 	// r.POST("/notify", app.NotifyPostHandler)
 	r.GET("/activity/:id", app.ActivityGetHandler)
