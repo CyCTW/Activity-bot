@@ -1,0 +1,13 @@
+{
+  "name": "Activity-bot",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/CyCTW/Activity-bot.git",
+  "author": "cyctw <yuaannn_192.cs06@g2.nctu.edu.tw>",
+  "license": "MIT",
+  "scripts": {
+    "build": "cd cmd/nextjs && yarn build",
+    "heroku-prebuild": "npm install -g yarn && cd cmd/nextjs && yarn install"
+  }
+
+}
