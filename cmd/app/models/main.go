@@ -26,6 +26,12 @@ type User struct {
 	Activities  []*Activity `gorm:"many2many:participations"`
 }
 
+type APIUser struct {
+	ID         uint
+	LineUserID string
+	Name       string
+}
+
 var DB *gorm.DB
 
 func ConnectDatabase() {
@@ -37,6 +43,7 @@ func ConnectDatabase() {
 	}
 	db.Migrator().DropTable(&User{})
 	db.Migrator().DropTable(&Activity{})
+	db.Migrator().DropTable(&Participation{})
 
 	db.AutoMigrate(&User{})
 	db.AutoMigrate(&Activity{})

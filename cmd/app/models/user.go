@@ -9,8 +9,12 @@ import (
 
 func (user *User) Create() error {
 	// Check exists
-	var new_user User
-	err := DB.Where("line_user_id = ?", user.LineUserID).First(&new_user).Error
+	// var new_user User
+	log.Print("Before user")
+	log.Print(user)
+	err := DB.Where("line_user_id = ?", user.LineUserID).First(&user).Error
+	log.Print("After user")
+	log.Print(user)
 
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		if err := DB.Create(&user).Error; err != nil {
@@ -19,6 +23,7 @@ func (user *User) Create() error {
 		log.Print("User Create success")
 
 	} else {
+		// Get user
 		log.Print("User exists")
 	}
 
@@ -34,9 +39,16 @@ func (user *User) GetByID(userID string) error {
 }
 
 func (user *User) GetByLineID(userLineID string) error {
+	log.Println("LineID")
+	log.Println(userLineID)
 	err := DB.Where("line_user_id = ?", userLineID).First(&user).Error
 	if err != nil {
 		return err
+	}
+	// Check user token exists
+	if user.AccessToken == "" {
+		log.Print("No AC Token!")
+		return errors.New("No Access token")
 	}
 	return nil
 }

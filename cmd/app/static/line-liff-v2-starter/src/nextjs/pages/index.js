@@ -11,6 +11,7 @@ import {
   FormControl,
   FormLabel,
   Input,
+  useToast,
   VStack,
 } from "@chakra-ui/react";
 // import DateTimePicker from 'react-datetime-picker';
@@ -27,6 +28,7 @@ export default function Home(props) {
   const [date, setDate] = useState();
   const [place, setPlace] = useState();
   const [loading, setLoading] = useState(false);
+  const toast = useToast()
 
   const handleSubmit = async (e) => {
     // Post to golang server
@@ -36,13 +38,17 @@ export default function Home(props) {
       const idToken = liff.getIDToken();
       const dateString = date.toDate().toJSON()
       const res = await createActivity({ name, dateString, place, idToken });
-      const activityID = res.data?.activityID;
+      const activityName = res.data?.activityName;
       // Submit message
 
       await liff.sendMessages([
         {
           type: "text",
-          text: `我要舉辦活動, ID: ${activityID}`,
+          text: `我舉辦了活動 ${activityName} !`,
+        },
+        {
+          type: "text",
+          text: `@顯示活動-${activityName}`,
         },
       ]);
       console.log("Success!!");
@@ -52,13 +58,17 @@ export default function Home(props) {
     }
     setLoading(false);
 
-    console.log("Success22!!");
+    toast({
+      title: 'Activity created.',
+      description: "We've created activity for you.",
+      position: 'bottom',
+      status: 'success',
+      duration: 5000,
+      isClosable: true,
+    })
   };
 
   const handleDate = (date) => {
-    // const jj = date.toDate();
-    // console.log(jj.toJSON());
-    // console.log(typeof jj);
     setDate(date);
   };
   return (
@@ -70,9 +80,8 @@ export default function Home(props) {
       <Head>
         <title>Activity Scheduler</title>
       </Head>
-      <Link href="/activity/second"><a>Second Post</a></Link>
       <div className="home">
-        <h1 className="home__title">Fill in your activity!</h1>
+        <h1 className="home__title">填寫活動!</h1>
         <FormControl>
           <VStack mt={10}>
             <FormLabel htmlFor="activity">活動名稱</FormLabel>
@@ -100,37 +109,6 @@ export default function Home(props) {
             </Button>
           </VStack>
         </FormControl>
-        {/* <form onSubmit={handleSubmit} method="post">
-          <label id="activity">Activity Name:</label>
-          <input
-            type="text"
-            id="activity"
-            name="activity"
-            required
-            onChange={(e) => setName(e.target.value)}
-          />
-          <br />
-          <label id="date">Date:</label>
-          <input
-            type="text"
-            id="date"
-            name="date"
-            required
-            onChange={(e) => setDate(e.target.value)}
-          />
-          <Datetime onChange={handleDate} value={date} />
-          <br />
-          <label id="name">Place:</label>
-          <input
-            type="text"
-            id="place"
-            name="place"
-            required
-            onChange={(e) => setPlace(e.target.value)}
-          />
-
-          <Button type="submit" isLoading={loading}>Submit</Button>
-        </form> */}
       </div>
     </div>
   );

@@ -13,15 +13,16 @@ import (
 var s = gocron.NewScheduler(time.UTC)
 
 func StartScheduler(user *models.User, activity *models.Activity) {
-	// stime := time.Date(2022, time.April, 22, 7, 19, 0, 0, time.UTC)
 	activityTime := activity.Date
-	remindTime := activityTime.Add(-time.Second * 30)
+
+	// Note: Default set to alert one minute before
+	remindTime := activityTime.Add(-time.Minute)
 
 	activity_id := strconv.FormatUint(uint64(activity.ID), 10)
-	message := fmt.Sprintf("您的活動 %v 將在一小時後舉辦", activity.Name)
+	message := fmt.Sprintf("您的活動 %v 將在一分鐘後舉辦", activity.Name)
 	job, _ := s.Every(1).Day().StartAt(remindTime).Tag(activity_id).Tag(user.LineUserID).Do(NotifyUser, user.AccessToken, message)
 	job.LimitRunsTo(1)
-	// s.Every(5).Seconds().Do(task)
+
 	s.StartAsync()
 	log.Print("Scheduler end")
 }
