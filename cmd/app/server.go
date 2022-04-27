@@ -22,8 +22,8 @@ func main() {
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.New()
 
-	// r.LoadHTMLGlob("./views/*")
-	r.Static("assets", "../nextjs/out")
+	r.LoadHTMLGlob("./cmd/app/views/*")
+	r.Static("assets", "./cmd/nextjs/out")
 	r.POST("/callback", app.CallbackHandler)
 	r.GET("/activity/:id", app.ActivityGetHandler)
 	r.GET("/user/:id", app.UserHandler)
