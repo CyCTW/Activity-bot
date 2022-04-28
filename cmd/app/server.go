@@ -30,6 +30,8 @@ func main() {
 	r.GET("/notify", app.NotifyGetHandler)
 	r.GET("/notify_test/:id", app.NotifyTestGetHandler)
 	r.POST("/activity", app.ActivityPostHandler)
-	r.Run()
+	if err := r.Run(); err != nil {
+		log.Fatal("Run failed")
+	}
 
 }

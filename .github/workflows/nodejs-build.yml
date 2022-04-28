@@ -1,0 +1,24 @@
+name: nextjs-build
+
+on:
+  push:
+    branches:
+      - master
+      - develop
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./cmd/nextjs
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Node 16.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+      - run: npm install -g yarn
+      - run: yarn install
+      - run: yarn build

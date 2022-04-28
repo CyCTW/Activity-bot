@@ -57,6 +57,7 @@ const Auth = (props) => {
   return (
     <div>
       <VStack>
+        <h1>請點選以下開啟通知按鈕</h1>
         {loginUser && notifyLink && (
           <Box as='button' borderRadius='md' bg='tomato' color='white' px={4} h={8}>
             <Link href={notifyLink}>開啟通知</Link>

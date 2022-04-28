@@ -2,6 +2,7 @@ package models
 
 import (
 	"errors"
+	"log"
 )
 
 func (activity *Activity) Create() error {
@@ -36,7 +37,11 @@ type Participation struct {
 func (activity *Activity) GetInfo(activityID string) (*[]APIUser, error) {
 	var users []APIUser
 
-	DB.Model(&activity).Association("Users").Find(&users)
+	err := DB.Model(&activity).Association("Users").Find(&users).Error
+	if err != nil {
+		log.Print(err())
+		return nil, errors.New("Get user info fail")
+	}
 
 	return &users, nil
 }

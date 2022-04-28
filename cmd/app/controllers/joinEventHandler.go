@@ -10,7 +10,7 @@ import (
 
 func (app *ProfileBot) WelcomeEventHandler(event *linebot.Event) error {
 	welcomeMessage_1 := "歡迎使用此機器人! 使用前請先\n1. 將此機器人設為好友\n2. 點選下方授權通知"
-	welcomeMessage_2 := "指令:\n輸入 \"@我要辦活動\" 來顯示辦活動的表單\n輸入 \"@顯示活動-[活動名稱]\" 來查看活動詳細資訊\n感謝你的使用><"
+	welcomeMessage_2 := "指令:\n輸入 \"@我要辦活動\" 來顯示辦活動的表單\n輸入 \"@顯示活動-[活動名稱]\" 來查看活動詳細資訊\n輸入 \"@注意事項\" 來顯示使用說明\n 感謝你的使用><"
 	imageURL := "https://i.imgur.com/Jt8IP8D.jpeg"
 	notifyURL := fmt.Sprintf("%v/auth.html", os.Getenv("LIFF_URL"))
 	var messages []linebot.SendingMessage

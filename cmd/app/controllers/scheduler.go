@@ -26,8 +26,3 @@ func StartScheduler(user *models.User, activity *models.Activity) {
 	s.StartAsync()
 	log.Print("Scheduler end")
 }
-
-func RemoveScheduler(user *models.User, activityID string) {
-	userLineID := user.LineUserID
-	s.RemoveByTags(userLineID, activityID)
-}

@@ -73,17 +73,22 @@ func verifyLineSignature(req *http.Request, channel_secret string) error {
 	body, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		log.Print("Read error")
+		return err
 	}
 
 	decoded, err := base64.StdEncoding.DecodeString(req.Header.Get("x-line-signature"))
 	if err != nil {
 		log.Print("decoded error")
+		return err
 	}
 	hash := hmac.New(sha256.New, []byte(channel_secret))
-	hash.Write(body)
+	if _, err := hash.Write(body); err != nil {
+		log.Print("Wreite error")
+		return err
+	}
 
 	res := hmac.Equal(hash.Sum(nil), decoded)
-	if res != true {
+	if !res {
 		return errors.New("Verification fail")
 	} else {
 		log.Print("Verify success!")
