@@ -10,6 +10,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./cmd/nextjs
     steps:
       - uses: actions/checkout@v3
       - name: Setup Node 16.x
@@ -17,6 +20,5 @@ jobs:
         with:
           node-version: 16.x
       - run: npm install -g yarn
-      - run: cd cmd/nextjs
       - run: yarn install
       - run: yarn build
