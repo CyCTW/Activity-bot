@@ -42,7 +42,7 @@ func ConnectDatabase() {
 	if err != nil {
 		panic("Failed to connect db")
 	}
-	if err := db.Migrator().DropTable(&User{}).Error; err != nil {
+	if err := db.Migrator().DropTable(&User{}); err != nil {
 		log.Fatal("Drop table user fail")
 	}
 	if err := db.Migrator().DropTable(&Activity{}); err != nil {
@@ -53,7 +53,7 @@ func ConnectDatabase() {
 
 	}
 
-	if err := db.AutoMigrate(&User{}).Error; err != nil {
+	if err := db.AutoMigrate(&User{}); err != nil {
 		log.Fatal("Migrate table User fail")
 	}
 	if err := db.AutoMigrate(&Activity{}); err != nil {
