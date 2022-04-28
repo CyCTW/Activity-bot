@@ -2,6 +2,8 @@
 ![golang workflow](https://github.com/cyctw/Activity-bot/actions/workflows/golangci-lint.yml/badge.svg)
 ![nodejs workflow](https://github.com/cyctw/Activity-bot/actions/workflows/nodejs-build.yml/badge.svg)
 
+
+
 ## Introduction
 這是一個可以管理群組或個人活動的LineBot，主要的功能為兩個: **建立事件跟參與事件。**
 
@@ -14,7 +16,8 @@
 - **個人使用情形**
     
     直接與Bot進行互動，建立自己的活動並自己參加，時間快到時一樣會有通知。
-
+## QRCode
+![image](static/images/Activity-bot-qrcode.png)
 ## System Architecture
 
 ![image](static/images/ActivityBot.drawio.png)
@@ -23,6 +26,7 @@
 當想要跟群組內的朋友約聚餐或約出去玩的時候，或是有一些重要活動(e.g. 搶票、作業Deadline)需要特別紀錄的時候，Line現有的功能似乎無法做到**設定一個事件，並且時間快到前通知**這件事情。
 
 因此，我決定試著設計一個簡單的Line bot來做到這件事情，讓使用者可以將Bot邀至群組，透過與他互動來建立新事件，並且此Bot會在時間快到提醒使用者。
+
 
 
 ## Bot Command
