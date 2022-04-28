@@ -26,8 +26,8 @@ func (app *ProfileBot) NotifyTestGetHandler(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"message": "Fail"})
 	}
-	if err := NotifyUser(user.AccessToken, "GGG"); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "notify fail"})
+	if err := NotifyUser(user.AccessToken, "test"); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "notify fail"})
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "success!"})
@@ -46,12 +46,14 @@ func (app *ProfileBot) NotifyGetHandler(c *gin.Context) {
 	access_token, err := getAccessToken(code)
 	if err != nil {
 		log.Print(err)
-		c.JSON(http.StatusBadRequest, gin.H{"message": "失敗，請稍後再試"})
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "失敗，請稍後再試"})
 		return
 	}
 	// Store access token
 	var user models.User
-	user.StoreAccessToken(user_id, username, access_token)
+	if err := user.StoreAccessToken(user_id, username, access_token); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "存取notify token錯誤"})
+	}
 	c.HTML(http.StatusOK, "notify.html", gin.H{"title": "website"})
 
 }

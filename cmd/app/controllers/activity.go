@@ -36,13 +36,13 @@ func (app *ProfileBot) ActivityGetHandler(c *gin.Context) {
 	var activity models.Activity
 	if err := activity.GetByID(activityID); err != nil {
 		log.Print("Error")
-		c.JSON(http.StatusBadRequest, gin.H{"message": "Fail"})
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Fail"})
 		return
 	}
 	users, err := activity.GetInfo(activityID)
 	if err != nil {
 		log.Print("Error")
-		c.JSON(http.StatusBadRequest, gin.H{"message": "Fail"})
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Fail"})
 		return
 	}
 	log.Print(users)
@@ -71,7 +71,7 @@ func (app *ProfileBot) ActivityPostHandler(c *gin.Context) {
 	user := models.User{LineUserID: lineProfile.Sub, Name: lineProfile.Name}
 	if err := user.Create(); err != nil {
 		log.Print(err)
-		c.JSON(http.StatusBadRequest, gin.H{"message": "Create User fail"})
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Create User fail"})
 		return
 	}
 	log.Print("User: <<")
@@ -91,7 +91,7 @@ func (app *ProfileBot) ActivityPostHandler(c *gin.Context) {
 	log.Print(activity)
 	if err := activity.Create(); err != nil {
 		log.Print(err)
-		c.JSON(http.StatusBadRequest, gin.H{"message": "Create Activity fail"})
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Create Activity fail"})
 		return
 	}
 	// TODO: Return Activity ID

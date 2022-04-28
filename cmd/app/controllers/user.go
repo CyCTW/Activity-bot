@@ -13,7 +13,7 @@ func (app *ProfileBot) UserHandler(c *gin.Context) {
 	var user models.User
 	if err := user.GetByID(userID); err != nil {
 		log.Print("Error")
-		c.JSON(http.StatusBadRequest, gin.H{"message": "Fail"})
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Fail"})
 		return
 	}
 

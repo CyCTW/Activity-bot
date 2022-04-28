@@ -1,6 +1,7 @@
 package models
 
 import (
+	"log"
 	"os"
 	"time"
 
@@ -41,12 +42,23 @@ func ConnectDatabase() {
 	if err != nil {
 		panic("Failed to connect db")
 	}
-	db.Migrator().DropTable(&User{})
-	db.Migrator().DropTable(&Activity{})
-	db.Migrator().DropTable(&Participation{})
+	if err := db.Migrator().DropTable(&User{}).Error; err != nil {
+		log.Fatal("Drop table user fail")
+	}
+	if err := db.Migrator().DropTable(&Activity{}); err != nil {
+		log.Fatal("Drop table activity fail")
+	}
+	if err := db.Migrator().DropTable(&Participation{}); err != nil {
+		log.Fatal("Drop table participation fail")
 
-	db.AutoMigrate(&User{})
-	db.AutoMigrate(&Activity{})
+	}
+
+	if err := db.AutoMigrate(&User{}).Error; err != nil {
+		log.Fatal("Migrate table User fail")
+	}
+	if err := db.AutoMigrate(&Activity{}); err != nil {
+		log.Fatal("Migrate table Activity fail")
+	}
 
 	DB = db
 }

@@ -83,7 +83,7 @@ func verifyLineSignature(req *http.Request, channel_secret string) error {
 	hash.Write(body)
 
 	res := hmac.Equal(hash.Sum(nil), decoded)
-	if res != true {
+	if !res {
 		return errors.New("Verification fail")
 	} else {
 		log.Print("Verify success!")
