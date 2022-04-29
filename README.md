@@ -18,6 +18,8 @@
     直接與Bot進行互動，建立自己的活動並自己參加，時間快到時一樣會有通知。
 ## QRCode
 ![image](static/images/Activity-bot-qrcode.png)
+
+- [Demo Video](https://youtu.be/sLSR_3cIwp8)
 ## System Architecture
 
 ![image](static/images/ActivityBot.drawio.png)
